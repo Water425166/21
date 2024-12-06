@@ -1,0 +1,78 @@
+facetime()
+ 
+on facetime()
+    tell application "Finder" to activate
+ 
+    tell application "Finder"
+        set chosenfile to (choose file)
+    end tell
+ 
+ 
+    tell application "FaceTime"
+        tell application "FaceTime" to activate
+ 
+        set phoneData to read chosenfile
+        set cards to paragraphs of phoneData
+        repeat with phone in cards
+ 
+            set num to the length of phone
+            if (num > 0) then
+                my check_data(phone)
+                delay 1
+            end if
+        end repeat
+ 
+    end tell
+end facetime
+ 
+ 
+-- 检测数据是否开通或启用facetime
+on check_data(phone)
+    tell application "System Events"
+        tell process "FaceTime"
+            --核心代码...
+        end tell
+    end tell
+end check_data
+ 
+ 
+-- 写入文件
+on write_to_file(this_data, target_file, append_data, append_end)
+    try
+        set the target_file to the target_file as text
+        set the open_target_file to ¬
+            open for access file target_file with write permission
+ 
+        if append_data is false then
+            set eof of the open_target_file to 0
+            write this_data to the open_target_file starting at eof
+        else if append_end is false then
+            try
+                set fp to open for access target_file
+                set myText to read fp
+                set eof of the open_target_file to 0
+                write this_data to the open_target_file starting at eof
+                write myText to the open_target_file starting at eof
+            on error
+                write this_data to the open_target_file starting at eof
+            end try
+        else
+            write this_data to the open_target_file starting at eof
+        end if
+ 
+        close access the open_target_file
+        return target_file
+    on error
+        try
+            close access file target_file
+        end try
+        return false
+    end try
+end write_to_file
+ 
+ 
+-- 获取当前文件的父文件夹路径
+on current_folder_path()
+    set UnixPath to POSIX path of ((path to me as text) & "::")
+    return UnixPath
+end current_folder_path
