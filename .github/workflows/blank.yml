@@ -1,6 +1,4 @@
 facetime()
- 
-on facetime()
     tell application "Finder" to activate
  
     tell application "Finder"
